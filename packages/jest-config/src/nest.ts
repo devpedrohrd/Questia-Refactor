@@ -1,5 +1,5 @@
-import type { Config } from 'jest';
-import { config as baseConfig } from './base';
+import type { Config } from 'jest'
+import { config as baseConfig } from './base'
 
 export const nestConfig = {
   ...baseConfig,
@@ -11,4 +11,4 @@ export const nestConfig = {
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
-} as const satisfies Config;
+} as const satisfies Config
