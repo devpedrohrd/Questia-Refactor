@@ -1,4 +1,3 @@
-import type { Link } from '@repo/api'
 import { Button } from '@repo/ui/button'
 import Image, { type ImageProps } from 'next/image'
 
@@ -20,7 +19,7 @@ const ThemeImage = (props: Props) => {
   )
 }
 
-async function getLinks(): Promise<Link[]> {
+async function getLinks(): Promise<any[]> {
   try {
     const res = await fetch('http://localhost:3000/links', {
       cache: 'no-store',
