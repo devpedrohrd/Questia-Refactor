@@ -8,6 +8,8 @@ import {
   Res,
   Get,
   Headers,
+  UseGuards,
+  Req,
 } from '@nestjs/common'
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
@@ -18,12 +20,15 @@ import {
 } from '../../application/use-cases'
 import { LoginDto, RegisterDto } from '../dtos'
 import { AuthExceptionFilter } from '../filters'
-import { Response } from 'express'
+import { Response, Request } from 'express'
 import { ForgotPasswordDto } from '../dtos/forgot-password.dto'
 import { ResetPasswordDto } from '../dtos/reset-password.dto'
 import { handleAuthResponse } from '../handles/handleAuth'
 import { RefreshTokenDto } from '../dtos/login.dto'
 import { RefreshUseCase } from '../../application/use-cases/refresh.use-case'
+import { GoogleAuthGuard } from '../../infrastructure/guards/google-auth.guard'
+import { GoogleOAuthUseCase } from '../../application/use-cases/google-oauth.use-case'
+import { GoogleProfile } from '../../infrastructure/strategies/google.strategy'
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -35,6 +40,7 @@ export class AuthController {
     private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
     private readonly refreshUseCase: RefreshUseCase,
+    private readonly googleOAuthUseCase: GoogleOAuthUseCase,
   ) {}
 
   @Post('register')
@@ -149,5 +155,40 @@ export class AuthController {
     return res.status(HttpStatus.OK).json({
       message: 'Senha redefinida com sucesso',
     })
+  }
+
+  // ─── Google OAuth ────────────────────────────────────────────────────────────
+
+  @Get('google')
+  @UseGuards(GoogleAuthGuard)
+  @ApiOperation({ summary: 'Iniciar login com Google' })
+  googleLogin() {}
+
+  @Get('google/callback')
+  @UseGuards(GoogleAuthGuard)
+  @ApiOperation({ summary: 'Callback do Google OAuth' })
+  async googleCallback(@Req() req: Request, @Res() res: Response) {
+    const profile = req.user as GoogleProfile
+
+    const { accessToken, refreshToken } =
+      await this.googleOAuthUseCase.execute(profile)
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+    }
+
+    res.cookie('access_token', accessToken, {
+      ...cookieOptions,
+      maxAge: 15 * 60 * 1000,
+    })
+
+    res.cookie('refresh_token', refreshToken, {
+      ...cookieOptions,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+
+    return res.redirect('http://localhost:3001/auth/callback')
   }
 }

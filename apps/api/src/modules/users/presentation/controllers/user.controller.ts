@@ -1,6 +1,5 @@
 import {
   Controller,
-  Post,
   Get,
   Patch,
   Delete,
@@ -9,7 +8,6 @@ import {
   HttpCode,
   HttpStatus,
   UseFilters,
-  Req,
   UseGuards,
 } from '@nestjs/common'
 import { UpdateUserDto } from '../dtos/update-user.dto'
@@ -17,14 +15,15 @@ import { UserExceptionFilter } from '../filters/user-exception.filter'
 import { FindUserUseCase } from '../../application/use-cases/find-user.use-case'
 import { UpdateUserUseCase } from '../../application/use-cases/update-user.use-case'
 import { DeleteUserUseCase } from '../../application/use-cases/delete-user.use-case'
-import { AuthenticatedRequest, AuthenticatedUser } from 'src/common/interfaces'
+import { AuthenticatedUser } from 'src/common/interfaces'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard'
+import { RolesGuard } from 'src/common/guards/roles.guard'
 import { CurrentUser, Roles } from 'src/common/decorators'
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 import { Role } from 'src/common/enums'
 
 @Controller('users')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @UseFilters(UserExceptionFilter)
 export class UserController {
   constructor(

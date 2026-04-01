@@ -64,18 +64,67 @@ enum DifficultyStrategy {
 // =========================
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String?
-  role      Role     @default(ALUNO)
+  id       String  @id @default(uuid())
+  name     String
+  email    String  @unique
+  password String?
+  role     Role    @default(ALUNO)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  quizzes             Quiz[]
-  attempts            Attempt[]
-  generationContexts  GenerationContext[]
+  quizzes            Quiz[]
+  attempts           Attempt[]
+  generationContexts GenerationContext[]
+
+  enrollments Enrollment[]
+
+  classes Class[]
+}
+
+model Class {
+  id String @id @default(uuid())
+
+  name String
+
+  subject String
+
+  description String?
+
+  code String @unique
+
+  teacherId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  teacher User @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  enrollments Enrollment[]
+
+  quizzes Quiz[]
+
+  @@index([teacherId])
+}
+
+model Enrollment {
+  id String @id @default(uuid())
+
+  userId String
+
+  classId String
+
+  role Role @default(ALUNO)
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, classId])
+  @@index([userId])
+  @@index([classId])
 }
 
 // =========================
@@ -88,13 +137,13 @@ model GenerationContext {
   name String
 
   gradeLevel String
-  subject String
-  topic String
+  subject    String
+  topic      String
 
   learningObjectives String[]
 
-  cognitiveLevel CognitiveLevel
-  languageStyle LanguageStyle
+  cognitiveLevel     CognitiveLevel
+  languageStyle      LanguageStyle
   difficultyStrategy DifficultyStrategy
 
   rules String[]
@@ -125,7 +174,7 @@ model Quiz {
   title String
   theme String
 
-  difficulty Difficulty
+  difficulty   Difficulty
   questionType QuestionType
 
   questionCount Int
@@ -134,7 +183,8 @@ model Quiz {
 
   status QuizStatus @default(DRAFT)
 
-  userId String
+  userId              String
+  classId             String
   generationContextId String?
 
   createdAt DateTime @default(now())
@@ -142,12 +192,15 @@ model Quiz {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  generationContext GenerationContext?  @relation(fields: [generationContextId], references: [id])
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  generationContext GenerationContext? @relation(fields: [generationContextId], references: [id])
 
   questions Question[]
-  attempts Attempt[]
+  attempts  Attempt[]
 
   @@index([userId])
+  @@index([classId])
   @@index([generationContextId])
 }
 
@@ -174,7 +227,7 @@ model Question {
   quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
   alternatives Alternative[]
-  answers Answer[]
+  answers      Answer[]
 
   @@index([quizId])
 }
@@ -206,7 +259,7 @@ model Alternative {
 model Attempt {
   id String @id @default(uuid())
 
-  score Int
+  score          Int
   totalQuestions Int
 
   percentage Float
@@ -238,7 +291,7 @@ model Answer {
   isCorrect Boolean
 
   questionId String
-  attemptId String
+  attemptId  String
 
   createdAt DateTime @default(now())
 

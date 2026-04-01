@@ -59,6 +59,36 @@ export type User = {
   updatedAt: Timestamp
 }
 
+export type Class = {
+  id: ID
+
+  name: string
+
+  subject: string
+
+  description?: string
+
+  code: string
+
+  teacherId: ID
+
+  createdAt: Timestamp
+
+  updatedAt: Timestamp
+}
+
+export type Enrollment = {
+  id: ID
+
+  userId: ID
+
+  classId: ID
+
+  role: Role
+
+  createdAt: Timestamp
+}
+
 // =========================
 // GENERATION CONTEXT
 // =========================

@@ -14,7 +14,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "generate": "prisma generate",
-    "migrate": "prisma migrate dev"
+    "migrate": "prisma migrate dev",
+    "studio": "prisma studio"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.11",
@@ -38,6 +39,7 @@
     "escape-html": "^1.0.3",
     "helmet": "^8.1.0",
     "nodemailer": "^8.0.4",
+    "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.20.0",
     "reflect-metadata": "^0.2.2",
@@ -53,6 +55,7 @@
     "@repo/typescript-config": "*",
     "@types/express": "^4.17.25",
     "@types/node": "^22.19.3",
+    "@types/passport-google-oauth20": "^2.0.17",
     "@types/pg": "^8.20.0",
     "@types/supertest": "^6.0.3",
     "eslint": "^9.39.2",

@@ -9,6 +9,12 @@ import { UserNotFoundException } from '../../domain/exceptions/user-not-found.ex
 import { EmailAlreadyExistsException } from '../../domain/exceptions/email-already-exists.exception'
 import { UserNotAutorizedException } from '../../domain/exceptions/user-not-autorized.exception'
 
+const EXCEPTION_MAP = {
+  [UserNotFoundException.name]: HttpStatus.NOT_FOUND,
+  [EmailAlreadyExistsException.name]: HttpStatus.CONFLICT,
+  [UserNotAutorizedException.name]: HttpStatus.UNAUTHORIZED,
+}
+
 @Catch(
   UserNotFoundException,
   EmailAlreadyExistsException,
@@ -19,17 +25,8 @@ export class UserExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp()
     const response = ctx.getResponse<Response>()
 
-    let status: number
-
-    if (exception instanceof UserNotFoundException) {
-      status = HttpStatus.NOT_FOUND
-    } else if (exception instanceof EmailAlreadyExistsException) {
-      status = HttpStatus.CONFLICT
-    } else if (exception instanceof UserNotAutorizedException) {
-      status = HttpStatus.UNAUTHORIZED
-    } else {
-      status = HttpStatus.INTERNAL_SERVER_ERROR
-    }
+    const status =
+      EXCEPTION_MAP[exception.name] || HttpStatus.INTERNAL_SERVER_ERROR
 
     response.status(status).json({
       statusCode: status,
