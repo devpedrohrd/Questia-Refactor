@@ -3,3 +3,46 @@ export enum Role {
   PROFESSOR = 'PROFESSOR',
   ALUNO = 'ALUNO',
 }
+
+export enum CognitiveLevel {
+  LEMBRAR = 'LEMBRAR',
+  COMPREENDER = 'COMPREENDER',
+  APLICAR = 'APLICAR',
+  ANALISAR = 'ANALISAR',
+  AVALIAR = 'AVALIAR',
+  CRIAR = 'CRIAR',
+}
+
+export enum LanguageStyle {
+  SIMPLES = 'SIMPLES',
+  FORMAL = 'FORMAL',
+  TECNICO = 'TECNICO',
+  INFANTIL = 'INFANTIL',
+  VESTIBULAR = 'VESTIBULAR',
+  ENEM = 'ENEM',
+}
+
+export enum DifficultyStrategy {
+  UNIFORME = 'UNIFORME',
+  PROGRESSIVA = 'PROGRESSIVA',
+  PERSONALIZADA = 'PERSONALIZADA',
+}
+
+export enum Difficulty {
+  FACIL = 'FACIL',
+  MEDIO = 'MEDIO',
+  DIFICIL = 'DIFICIL',
+}
+
+export enum QuestionType {
+  MULTIPLA_ESCOLHA = 'MULTIPLA_ESCOLHA',
+  VERDADEIRO_FALSO = 'VERDADEIRO_FALSO',
+  DISCURSIVA = 'DISCURSIVA',
+}
+
+export enum QuizStatus {
+  DRAFT = 'DRAFT',
+  GENERATED = 'GENERATED',
+  PUBLISHED = 'PUBLISHED',
+  ARCHIVED = 'ARCHIVED',
+}
