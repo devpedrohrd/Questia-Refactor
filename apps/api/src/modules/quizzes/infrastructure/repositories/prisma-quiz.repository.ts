@@ -24,10 +24,59 @@ export class PrismaQuizRepository implements IQuizRepository {
   async findByIdWithQuestions(id: string): Promise<any | null> {
     return this.prisma.quiz.findUnique({
       where: { id },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        createdAt: true,
         questions: {
-          include: { alternatives: true },
-          orderBy: { createdAt: 'asc' },
+          orderBy: {
+            createdAt: 'asc',
+          },
+          select: {
+            id: true,
+            statement: true,
+            type: true,
+
+            alternatives: {
+              select: {
+                id: true,
+                text: true,
+                isCorrect: true,
+              },
+            },
+          },
+        },
+      },
+    })
+  }
+
+  async findByIdForStudent(id: string): Promise<any | null> {
+    return this.prisma.quiz.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        difficulty: true,
+        questionType: true,
+        questionCount: true,
+        status: true,
+        theme: true,
+        accessLink: true,
+        questions: {
+          orderBy: {
+            createdAt: 'asc',
+          },
+          select: {
+            id: true,
+            statement: true,
+            alternatives: {
+              select: {
+                id: true,
+                text: true,
+              },
+            },
+          },
         },
       },
     })

@@ -13,7 +13,7 @@ export class FindQuizUseCase {
   ) {}
 
   async execute(id: string) {
-    const quiz = await this.quizRepository.findByIdWithQuestions(id)
+    const quiz = await this.quizRepository.findByIdForStudent(id)
 
     if (!quiz) {
       throw new QuizNotFoundException(id)

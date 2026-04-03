@@ -131,7 +131,9 @@ ${questionType === 'DISCURSIVA' ? 'Para questões discursivas, NÃO inclua o cam
     } catch (error) {
       this.logger.error(`Erro ao parsear resposta da IA: ${error}`)
       this.logger.debug(`Resposta bruta: ${text}`)
-      throw new BadRequestException('Falha ao processar resposta da IA. Tente novamente.')
+      throw new BadRequestException(
+        'Falha ao processar resposta da IA. Tente novamente.',
+      )
     }
   }
 }

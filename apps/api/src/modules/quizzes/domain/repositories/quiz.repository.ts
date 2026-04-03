@@ -17,6 +17,7 @@ export interface IQuizRepository {
   create(data: CreateQuizInput): Promise<Quiz>
   findById(id: string): Promise<Quiz | null>
   findByIdWithQuestions(id: string): Promise<any | null>
+  findByIdForStudent(id: string): Promise<any | null>
   findByClassId(classId: string): Promise<Quiz[]>
   findByUserId(userId: string): Promise<Quiz[]>
   findByAccessLink(accessLink: string): Promise<Quiz | null>

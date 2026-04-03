@@ -15,7 +15,8 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "generate": "prisma generate",
     "migrate": "prisma migrate dev",
-    "studio": "prisma studio"
+    "studio": "prisma studio",
+    "db": "docker start 6946a9b554dc"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

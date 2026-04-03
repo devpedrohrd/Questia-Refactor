@@ -6,6 +6,7 @@ import { ClassesModule } from './modules/classes/classes.module'
 import { EnrollmentsModule } from './modules/enrollments/enrollments.module'
 import { GenerationContextsModule } from './modules/generation-contexts/generation-contexts.module'
 import { QuizzesModule } from './modules/quizzes/quizzes.module'
+import { AttemptsModule } from './modules/attempts/attempts.module'
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { QuizzesModule } from './modules/quizzes/quizzes.module'
     EnrollmentsModule,
     GenerationContextsModule,
     QuizzesModule,
+    AttemptsModule,
   ],
   controllers: [],
   providers: [],

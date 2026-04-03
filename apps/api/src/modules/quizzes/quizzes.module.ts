@@ -42,5 +42,6 @@ import { GenerationContextsModule } from '../generation-contexts/generation-cont
       useClass: GeminiQuestionGeneratorService,
     },
   ],
+  exports: [QUIZ_REPOSITORY],
 })
 export class QuizzesModule {}
