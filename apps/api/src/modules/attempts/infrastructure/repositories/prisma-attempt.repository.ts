@@ -18,15 +18,44 @@ export class PrismaAttemptRepository implements IAttemptRepository {
     const attempt = await this.prisma.attempt.create({
       data: {
         ...attemptData,
-        answers: {
-          createMany: {
-            data: answers.map((a) => ({
-              response: a.response,
-              isCorrect: a.isCorrect,
-              questionId: a.questionId,
-            })),
+        ...(answers && {
+          answers: {
+            createMany: {
+              data: answers.map((a) => ({
+                response: a.response,
+                isCorrect: a.isCorrect,
+                questionId: a.questionId,
+              })),
+            },
           },
-        },
+        }),
+      },
+    })
+
+    return PrismaAttemptMapper.toDomain(attempt)
+  }
+
+  async update(
+    id: string,
+    data: Partial<CreateAttemptInput>,
+  ): Promise<Attempt> {
+    const { answers, ...attemptData } = data
+
+    const attempt = await this.prisma.attempt.update({
+      where: { id },
+      data: {
+        ...attemptData,
+        ...(answers && {
+          answers: {
+            createMany: {
+              data: answers.map((a) => ({
+                response: a.response,
+                isCorrect: a.isCorrect,
+                questionId: a.questionId,
+              })),
+            },
+          },
+        }),
       },
     })
 
@@ -43,6 +72,7 @@ export class PrismaAttemptRepository implements IAttemptRepository {
       where: { id },
       select: {
         id: true,
+        status: true,
         score: true,
         totalQuestions: true,
         percentage: true,

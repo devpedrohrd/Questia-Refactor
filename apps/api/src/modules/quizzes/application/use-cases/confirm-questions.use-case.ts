@@ -14,6 +14,7 @@ import { QuizNotAuthorizedException } from '../../domain/exceptions/quiz-not-aut
 import { QuizAlreadyPublishedException } from '../../domain/exceptions/quiz-already-published.exception'
 import { AuthenticatedUser } from 'src/common/interfaces'
 import { Role } from 'src/common/enums'
+import { Redis } from 'ioredis'
 
 @Injectable()
 export class ConfirmQuestionsUseCase {
@@ -22,7 +23,11 @@ export class ConfirmQuestionsUseCase {
     private readonly quizRepository: IQuizRepository,
     @Inject(QUESTION_REPOSITORY)
     private readonly questionRepository: IQuestionRepository,
-  ) {}
+  ) {
+    this.redis = new Redis(process.env.REDIS_URL as string)
+  }
+
+  private readonly redis: Redis
 
   async execute(
     quizId: string,
@@ -55,6 +60,10 @@ export class ConfirmQuestionsUseCase {
       await this.questionRepository.createMany(questionsWithQuizId)
 
     await this.quizRepository.updateStatus(quizId, 'GENERATED')
+
+    // Clean up Redis cache since it is formally saved
+    const redisKey = `quiz-preview:${quizId}`
+    await this.redis.del(redisKey)
 
     return savedQuestions
   }

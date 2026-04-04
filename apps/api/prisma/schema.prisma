@@ -256,9 +256,16 @@ model Alternative {
 // ATTEMPT
 // =========================
 
+enum AttemptStatus {
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
 model Attempt {
   id String @id @default(uuid())
 
+  status         AttemptStatus @default(PROCESSING)
   score          Int
   totalQuestions Int
 

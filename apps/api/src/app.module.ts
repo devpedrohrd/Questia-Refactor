@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common'
+import { BullModule } from '@nestjs/bullmq'
 import { PrismaModule } from './config/prisma/prisma.module'
 import { UsersModule } from './modules/users/users.module'
 import { AuthModule } from './modules/auth/auth.module'
@@ -10,6 +11,16 @@ import { AttemptsModule } from './modules/attempts/attempts.module'
 
 @Module({
   imports: [
+    BullModule.forRoot({
+      connection: {
+        url: process.env.REDIS_URL,
+      },
+      skipVersionCheck: true,
+      defaultJobOptions: {
+        attempts: 3,
+        removeOnFail: true,
+      },
+    }),
     PrismaModule,
     UsersModule,
     AuthModule,

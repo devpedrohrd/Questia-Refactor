@@ -8,12 +8,13 @@ export type CreateAnswerInput = {
 }
 
 export type CreateAttemptInput = {
+  status: 'PROCESSING' | 'COMPLETED' | 'FAILED'
   score: number
   totalQuestions: number
   percentage: number
   userId: string
   quizId: string
-  answers: CreateAnswerInput[]
+  answers?: CreateAnswerInput[]
 }
 
 export type AttemptWithAnswers = Attempt & {
@@ -27,6 +28,7 @@ export interface IAttemptRepository {
   findByQuizId(quizId: string): Promise<Attempt[]>
   findByUserId(userId: string): Promise<Attempt[]>
   findByUserAndQuiz(userId: string, quizId: string): Promise<Attempt | null>
+  update(id: string, data: Partial<CreateAttemptInput>): Promise<Attempt>
 }
 
 export const ATTEMPT_REPOSITORY = Symbol('ATTEMPT_REPOSITORY')

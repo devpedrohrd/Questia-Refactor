@@ -24,6 +24,7 @@ import { FindQuizzesByClassUseCase } from '../../application/use-cases/find-quiz
 import { FindQuizzesByUserUseCase } from '../../application/use-cases/find-quizzes-by-user.use-case'
 import { PublishQuizUseCase } from '../../application/use-cases/publish-quiz.use-case'
 import { DeleteQuizUseCase } from '../../application/use-cases/delete-quiz.use-case'
+import { GetGeneratedPreviewUseCase } from '../../application/use-cases/get-generated-preview.use-case'
 import { AuthenticatedUser } from 'src/common/interfaces'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard'
 import { RolesGuard } from 'src/common/guards/roles.guard'
@@ -44,6 +45,7 @@ export class QuizController {
     private readonly findQuizzesByUserUseCase: FindQuizzesByUserUseCase,
     private readonly publishQuizUseCase: PublishQuizUseCase,
     private readonly deleteQuizUseCase: DeleteQuizUseCase,
+    private readonly getGeneratedPreviewUseCase: GetGeneratedPreviewUseCase,
   ) {}
 
   @Post()
@@ -88,6 +90,25 @@ export class QuizController {
       dto.generationContextId,
       user,
     )
+  }
+
+  @Get(':id/generated-preview')
+  @Roles(Role.PROFESSOR)
+  @ApiOperation({
+    summary:
+      'Obtém o preview das questões geradas pela IA armazenadas no Redis',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Estado da geração (PENDING ou AVAILABLE e questões)',
+  })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  @ApiResponse({ status: 404, description: 'Quiz não encontrado' })
+  async getGeneratedPreview(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.getGeneratedPreviewUseCase.execute(id, user)
   }
 
   @Post(':id/confirm')

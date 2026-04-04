@@ -200,6 +200,8 @@ export type Alternative = {
 export type Attempt = {
   id: ID
 
+  status: 'PROCESSING' | 'COMPLETED' | 'FAILED'
+
   score: number
 
   totalQuestions: number

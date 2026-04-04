@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import { Redis } from 'ioredis'
 import {
   IQuizRepository,
   QUIZ_REPOSITORY,
@@ -7,23 +8,23 @@ import { QuizNotFoundException } from '../../domain/exceptions/quiz-not-found.ex
 import { QuizNotAuthorizedException } from '../../domain/exceptions/quiz-not-authorized.exception'
 import { AuthenticatedUser } from 'src/common/interfaces'
 import { Role } from 'src/common/enums'
-import { InjectQueue } from '@nestjs/bullmq'
-import { Queue } from 'bullmq'
+import { GeneratedQuestion } from '../../infrastructure/ai/ai-question-generator.interface'
 
 @Injectable()
-export class GenerateQuestionsUseCase {
+export class GetGeneratedPreviewUseCase {
+  private readonly redis: Redis
+
   constructor(
     @Inject(QUIZ_REPOSITORY)
     private readonly quizRepository: IQuizRepository,
-    @InjectQueue('quizzes')
-    private readonly quizzesQueue: Queue,
-  ) {}
+  ) {
+    this.redis = new Redis(process.env.REDIS_URL as string)
+  }
 
   async execute(
     quizId: string,
-    generationContextId: string | undefined,
     user: AuthenticatedUser,
-  ): Promise<{ message: string; jobId: string }> {
+  ): Promise<{ status: string; questions?: GeneratedQuestion[] }> {
     const quiz = await this.quizRepository.findById(quizId)
 
     if (!quiz) {
@@ -34,14 +35,14 @@ export class GenerateQuestionsUseCase {
       throw new QuizNotAuthorizedException('QUIZ_NOT_AUTHORIZED')
     }
 
-    const job = await this.quizzesQueue.add('generate-questions', {
-      quizId,
-      generationContextId,
-    })
+    const redisKey = `quiz-preview:${quizId}`
+    const cachedData = await this.redis.get(redisKey)
 
-    return {
-      message: 'Geração de questões iniciada em segundo plano',
-      jobId: job.id as string,
+    if (!cachedData) {
+      return { status: 'PENDING' }
     }
+
+    const questions: GeneratedQuestion[] = JSON.parse(cachedData)
+    return { status: 'AVAILABLE', questions }
   }
 }
