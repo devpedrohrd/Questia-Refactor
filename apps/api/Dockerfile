@@ -1,18 +1,22 @@
 # ============================================
 # Stage 1: Install dependencies
 # ============================================
-FROM oven/bun:1.2.9 AS deps
+FROM node:20-alpine AS deps
+
+RUN npm install -g bun@1.2.9
 
 WORKDIR /app
 
 # Copy root workspace files
-COPY package.json bun.lock ./
-COPY apps/api/package.json ./apps/api/package.json
+COPY package.json bun.lock turbo.json tsconfig.json ./
 
-# Copy shared packages
+# Copy all packages structure
+COPY apps/api/package.json ./apps/api/package.json
+COPY apps/web/package.json ./apps/web/package.json
 COPY packages/api/package.json ./packages/api/package.json
-COPY packages/typescript-config/ ./packages/typescript-config/
+COPY packages/ui/package.json ./packages/ui/package.json
 COPY packages/eslint-config/ ./packages/eslint-config/
+COPY packages/typescript-config/ ./packages/typescript-config/
 COPY packages/jest-config/ ./packages/jest-config/
 
 # Install dependencies (frozen lockfile for reproducibility)
@@ -21,13 +25,14 @@ RUN bun install --frozen-lockfile
 # ============================================
 # Stage 2: Build the application
 # ============================================
-FROM oven/bun:1.2.9 AS builder
+FROM node:20-alpine AS builder
+
+RUN npm install -g bun@1.2.9
 
 WORKDIR /app
 
 # Copy everything from deps stage
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 
 # Copy source code
 COPY packages/ ./packages/
@@ -46,7 +51,7 @@ RUN cd apps/api && bun run build
 # ============================================
 # Stage 3: Production image
 # ============================================
-FROM oven/bun:1.2.9 AS production
+FROM node:20-alpine AS production
 
 RUN apk add --no-cache dumb-init
 
@@ -56,7 +61,7 @@ ENV NODE_ENV=production
 
 # Copy built output and necessary runtime files
 COPY --from=builder /app/apps/api/dist ./dist
-COPY --from=builder /app/apps/api/node_modules ./node_modules
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/apps/api/prisma ./prisma
