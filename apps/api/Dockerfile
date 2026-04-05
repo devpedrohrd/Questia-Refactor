@@ -1,9 +1,7 @@
 # ============================================
 # Stage 1: Install dependencies
 # ============================================
-FROM node:20-alpine AS deps
-
-RUN corepack enable && corepack prepare bun@1.2.9 --activate
+FROM oven/bun:1.2.9 AS deps
 
 WORKDIR /app
 
@@ -23,9 +21,7 @@ RUN bun install --frozen-lockfile
 # ============================================
 # Stage 2: Build the application
 # ============================================
-FROM node:20-alpine AS builder
-
-RUN corepack enable && corepack prepare bun@1.2.9 --activate
+FROM oven/bun:1.2.9 AS builder
 
 WORKDIR /app
 
@@ -50,7 +46,7 @@ RUN cd apps/api && bun run build
 # ============================================
 # Stage 3: Production image
 # ============================================
-FROM node:20-alpine AS production
+FROM oven/bun:1.2.9 AS production
 
 RUN apk add --no-cache dumb-init
 
