@@ -1,3 +1,3 @@
-import { nestConfig } from '@repo/jest-config'
+const { nestConfig } = require('@repo/jest-config/nest')
 
 export default nestConfig
