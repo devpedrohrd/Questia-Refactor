@@ -7,6 +7,7 @@ import { EnrollmentNotFoundException } from '../../domain/exceptions/enrollment-
 import { EnrollmentNotAuthorizedException } from '../../domain/exceptions/enrollment-not-authorized.exception'
 import { AuthenticatedUser } from 'src/common/interfaces'
 import { Role } from 'src/common/enums'
+import { CacheInvalidate } from 'src/common/cache'
 
 @Injectable()
 export class UnenrollUseCase {
@@ -15,6 +16,11 @@ export class UnenrollUseCase {
     private readonly enrollmentRepository: IEnrollmentRepository,
   ) {}
 
+  @CacheInvalidate(
+    (id: string) => `cache:enrollment:${id}`,
+    'cache:enrollments-by-user:*',
+    'cache:enrollments-by-class:*',
+  )
   async execute(id: string, user: AuthenticatedUser): Promise<void> {
     const enrollment = await this.enrollmentRepository.findById(id)
 

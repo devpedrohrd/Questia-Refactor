@@ -5,6 +5,7 @@ import {
   AttemptWithAnswers,
 } from '../../domain/repositories/attempt.repository'
 import { AttemptNotFoundException } from '../../domain/exceptions/attempt-not-found.exception'
+import { Cacheable } from 'src/common/cache'
 
 @Injectable()
 export class FindAttemptUseCase {
@@ -13,6 +14,7 @@ export class FindAttemptUseCase {
     private readonly attemptRepository: IAttemptRepository,
   ) {}
 
+  @Cacheable('attempt', 600)
   async execute(id: string): Promise<AttemptWithAnswers> {
     const attempt = await this.attemptRepository.findByIdWithAnswers(id)
 

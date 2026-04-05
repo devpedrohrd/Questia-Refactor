@@ -8,6 +8,7 @@ import {
 import { ClassCodeAlreadyExistsException } from '../../domain/exceptions/class-code-already-exists.exception'
 import { AuthenticatedUser } from 'src/common/interfaces'
 import { randomBytes } from 'crypto'
+import { CacheInvalidate } from 'src/common/cache'
 
 @Injectable()
 export class CreateClassUseCase {
@@ -16,6 +17,7 @@ export class CreateClassUseCase {
     private readonly classRepository: IClassRepository,
   ) {}
 
+  @CacheInvalidate('cache:classes-by-teacher:*')
   async execute(
     data: Omit<CreateClassInput, 'code' | 'teacherId'>,
     user: AuthenticatedUser,

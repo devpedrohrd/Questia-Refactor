@@ -8,6 +8,7 @@ import { QuizNotFoundException } from '../../domain/exceptions/quiz-not-found.ex
 import { QuizNotAuthorizedException } from '../../domain/exceptions/quiz-not-authorized.exception'
 import { AuthenticatedUser } from 'src/common/interfaces'
 import { Role } from 'src/common/enums'
+import { CacheInvalidate } from 'src/common/cache'
 
 @Injectable()
 export class PublishQuizUseCase {
@@ -16,6 +17,11 @@ export class PublishQuizUseCase {
     private readonly quizRepository: IQuizRepository,
   ) {}
 
+  @CacheInvalidate(
+    (id: string) => `cache:quiz:${id}`,
+    'cache:quizzes-by-user:*',
+    'cache:quizzes-by-class:*',
+  )
   async execute(id: string, user: AuthenticatedUser): Promise<Quiz> {
     const quiz = await this.quizRepository.findById(id)
 

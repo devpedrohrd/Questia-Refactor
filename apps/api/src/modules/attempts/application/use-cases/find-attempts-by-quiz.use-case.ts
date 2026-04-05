@@ -4,6 +4,7 @@ import {
   IAttemptRepository,
   ATTEMPT_REPOSITORY,
 } from '../../domain/repositories/attempt.repository'
+import { Cacheable } from 'src/common/cache'
 
 @Injectable()
 export class FindAttemptsByQuizUseCase {
@@ -12,6 +13,7 @@ export class FindAttemptsByQuizUseCase {
     private readonly attemptRepository: IAttemptRepository,
   ) {}
 
+  @Cacheable('attempts-by-quiz', 180)
   async execute(quizId: string): Promise<Attempt[]> {
     return this.attemptRepository.findByQuizId(quizId)
   }

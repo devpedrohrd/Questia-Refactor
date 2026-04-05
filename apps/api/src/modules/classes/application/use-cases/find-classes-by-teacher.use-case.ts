@@ -4,6 +4,7 @@ import {
   IClassRepository,
   CLASS_REPOSITORY,
 } from '../../domain/repositories/class.repository'
+import { Cacheable } from 'src/common/cache'
 
 @Injectable()
 export class FindClassesByTeacherUseCase {
@@ -12,6 +13,7 @@ export class FindClassesByTeacherUseCase {
     private readonly classRepository: IClassRepository,
   ) {}
 
+  @Cacheable('classes-by-teacher', 180)
   async execute(teacherId: string): Promise<Class[]> {
     return this.classRepository.findByTeacherId(teacherId)
   }

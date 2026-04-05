@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { BullModule } from '@nestjs/bullmq'
 import { PrismaModule } from './config/prisma/prisma.module'
+import { CacheModule } from './common/cache'
 import { UsersModule } from './modules/users/users.module'
 import { AuthModule } from './modules/auth/auth.module'
 import { ClassesModule } from './modules/classes/classes.module'
@@ -21,6 +22,7 @@ import { AttemptsModule } from './modules/attempts/attempts.module'
         removeOnFail: true,
       },
     }),
+    CacheModule,
     PrismaModule,
     UsersModule,
     AuthModule,

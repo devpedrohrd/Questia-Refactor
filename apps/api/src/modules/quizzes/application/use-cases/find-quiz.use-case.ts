@@ -4,6 +4,7 @@ import {
   QUIZ_REPOSITORY,
 } from '../../domain/repositories/quiz.repository'
 import { QuizNotFoundException } from '../../domain/exceptions/quiz-not-found.exception'
+import { Cacheable } from 'src/common/cache'
 
 @Injectable()
 export class FindQuizUseCase {
@@ -12,6 +13,7 @@ export class FindQuizUseCase {
     private readonly quizRepository: IQuizRepository,
   ) {}
 
+  @Cacheable('quiz', 300)
   async execute(id: string) {
     const quiz = await this.quizRepository.findByIdForStudent(id)
 

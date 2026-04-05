@@ -81,7 +81,26 @@ Para cada questão de verdadeiro ou falso, gere 2 alternativas: "Verdadeiro" e "
 `
     }
 
-    prompt += `
+    if (questionType === 'DISCURSIVA') {
+      prompt += `
+Responda EXCLUSIVAMENTE com um JSON válido no seguinte formato (sem markdown, sem texto extra).
+Questões discursivas NÃO possuem alternativas. Inclua apenas os campos abaixo:
+[
+  {
+    "statement": "Enunciado da questão discursiva",
+    "type": "DISCURSIVA",
+    "explanation": "Explicação detalhada de como a resposta deve ser elaborada",
+    "correctAnswer": "Resposta esperada completa e detalhada"
+  }
+]
+
+IMPORTANTE:
+- NÃO inclua o campo "alternatives" em nenhuma questão.
+- O campo "correctAnswer" é OBRIGATÓRIO e deve conter uma resposta modelo completa.
+- O campo "explanation" deve conter os critérios de avaliação ou pontos-chave esperados na resposta.
+`
+    } else {
+      prompt += `
 Responda EXCLUSIVAMENTE com um JSON válido no seguinte formato (sem markdown, sem texto extra):
 [
   {
@@ -98,9 +117,8 @@ Responda EXCLUSIVAMENTE com um JSON válido no seguinte formato (sem markdown, s
     ]
   }
 ]
-
-${questionType === 'DISCURSIVA' ? 'Para questões discursivas, NÃO inclua o campo "alternatives".' : ''}
 `
+    }
 
     return prompt
   }
@@ -121,13 +139,18 @@ ${questionType === 'DISCURSIVA' ? 'Para questões discursivas, NÃO inclua o cam
         throw new BadRequestException('Resposta da IA não é um array')
       }
 
-      return parsed.map((q: any) => ({
-        statement: q.statement,
-        type: q.type || params.questionType,
-        explanation: q.explanation || undefined,
-        correctAnswer: q.correctAnswer || undefined,
-        alternatives: q.alternatives || undefined,
-      }))
+      return parsed.map((q: any) => {
+        const type = q.type || params.questionType
+        const isDiscursiva = type === 'DISCURSIVA'
+
+        return {
+          statement: q.statement,
+          type,
+          explanation: q.explanation || undefined,
+          correctAnswer: q.correctAnswer || undefined,
+          alternatives: isDiscursiva ? undefined : q.alternatives || undefined,
+        }
+      })
     } catch (error) {
       this.logger.error(`Erro ao parsear resposta da IA: ${error}`)
       this.logger.debug(`Resposta bruta: ${text}`)

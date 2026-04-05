@@ -9,6 +9,7 @@ import { UserNotFoundException } from '../../domain/exceptions/user-not-found.ex
 import { AuthenticatedUser } from 'src/common/interfaces'
 import { UserNotAutorizedException } from '../../domain/exceptions/user-not-autorized.exception'
 import { Role } from 'src/common/enums'
+import { CacheInvalidate } from 'src/common/cache'
 
 @Injectable()
 export class UpdateUserUseCase {
@@ -17,6 +18,7 @@ export class UpdateUserUseCase {
     private readonly userRepository: IUserRepository,
   ) {}
 
+  @CacheInvalidate((id: string) => `cache:user:${id}`)
   async execute(
     id: string,
     data: UpdateUserInput,

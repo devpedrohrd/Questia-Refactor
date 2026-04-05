@@ -7,6 +7,7 @@ import {
 } from '../../domain/repositories/quiz.repository'
 import { AuthenticatedUser } from 'src/common/interfaces'
 import { randomBytes } from 'crypto'
+import { CacheInvalidate } from 'src/common/cache'
 
 @Injectable()
 export class CreateQuizUseCase {
@@ -15,6 +16,7 @@ export class CreateQuizUseCase {
     private readonly quizRepository: IQuizRepository,
   ) {}
 
+  @CacheInvalidate('cache:quizzes-by-user:*', 'cache:quizzes-by-class:*')
   async execute(
     data: Omit<CreateQuizInput, 'userId' | 'accessLink' | 'status'>,
     user: AuthenticatedUser,

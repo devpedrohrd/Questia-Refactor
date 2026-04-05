@@ -5,6 +5,7 @@ import {
   ENROLLMENT_REPOSITORY,
 } from '../../domain/repositories/enrollment.repository'
 import { EnrollmentNotFoundException } from '../../domain/exceptions/enrollment-not-found.exception'
+import { Cacheable } from 'src/common/cache'
 
 @Injectable()
 export class FindEnrollmentUseCase {
@@ -13,6 +14,7 @@ export class FindEnrollmentUseCase {
     private readonly enrollmentRepository: IEnrollmentRepository,
   ) {}
 
+  @Cacheable('enrollment', 300)
   async execute(id: string): Promise<Enrollment> {
     const enrollment = await this.enrollmentRepository.findById(id)
 

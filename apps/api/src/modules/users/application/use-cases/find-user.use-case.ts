@@ -5,6 +5,7 @@ import {
   USER_REPOSITORY,
 } from '../../domain/repositories/user.repository'
 import { UserNotFoundException } from '../../domain/exceptions/user-not-found.exception'
+import { Cacheable } from 'src/common/cache'
 
 @Injectable()
 export class FindUserUseCase {
@@ -13,6 +14,7 @@ export class FindUserUseCase {
     private readonly userRepository: IUserRepository,
   ) {}
 
+  @Cacheable('user', 300)
   async execute(id: string): Promise<User> {
     const user = await this.userRepository.findById(id)
 

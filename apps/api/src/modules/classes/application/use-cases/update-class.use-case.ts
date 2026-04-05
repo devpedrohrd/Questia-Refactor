@@ -9,6 +9,7 @@ import { ClassNotFoundException } from '../../domain/exceptions/class-not-found.
 import { ClassNotAuthorizedException } from '../../domain/exceptions/class-not-authorized.exception'
 import { AuthenticatedUser } from 'src/common/interfaces'
 import { Role } from 'src/common/enums'
+import { CacheInvalidate } from 'src/common/cache'
 
 @Injectable()
 export class UpdateClassUseCase {
@@ -17,6 +18,10 @@ export class UpdateClassUseCase {
     private readonly classRepository: IClassRepository,
   ) {}
 
+  @CacheInvalidate(
+    (id: string) => `cache:class:${id}`,
+    'cache:classes-by-teacher:*',
+  )
   async execute(
     id: string,
     data: UpdateClassInput,

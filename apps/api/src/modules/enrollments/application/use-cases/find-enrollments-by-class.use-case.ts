@@ -4,6 +4,7 @@ import {
   IEnrollmentRepository,
   ENROLLMENT_REPOSITORY,
 } from '../../domain/repositories/enrollment.repository'
+import { Cacheable } from 'src/common/cache'
 
 @Injectable()
 export class FindEnrollmentsByClassUseCase {
@@ -12,6 +13,7 @@ export class FindEnrollmentsByClassUseCase {
     private readonly enrollmentRepository: IEnrollmentRepository,
   ) {}
 
+  @Cacheable('enrollments-by-class', 180)
   async execute(classId: string): Promise<Enrollment[]> {
     return this.enrollmentRepository.findByClassId(classId)
   }

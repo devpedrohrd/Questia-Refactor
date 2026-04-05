@@ -14,6 +14,7 @@ import { QuizNotPublishedException } from '../../domain/exceptions/quiz-not-publ
 import { AuthenticatedUser } from 'src/common/interfaces'
 import { InjectQueue } from '@nestjs/bullmq'
 import { Queue } from 'bullmq'
+import { CacheInvalidate } from 'src/common/cache'
 
 export type AnswerInput = {
   questionId: string
@@ -32,6 +33,7 @@ export class SubmitAttemptUseCase {
     private readonly attemptsQueue: Queue,
   ) {}
 
+  @CacheInvalidate('cache:attempts-by-user:*', 'cache:attempts-by-quiz:*')
   async execute(
     quizId: string,
     answers: AnswerInput[],

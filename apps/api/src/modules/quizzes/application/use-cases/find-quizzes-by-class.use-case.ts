@@ -4,6 +4,7 @@ import {
   IQuizRepository,
   QUIZ_REPOSITORY,
 } from '../../domain/repositories/quiz.repository'
+import { Cacheable } from 'src/common/cache'
 
 @Injectable()
 export class FindQuizzesByClassUseCase {
@@ -12,6 +13,7 @@ export class FindQuizzesByClassUseCase {
     private readonly quizRepository: IQuizRepository,
   ) {}
 
+  @Cacheable('quizzes-by-class', 180)
   async execute(classId: string): Promise<Quiz[]> {
     return this.quizRepository.findByClassId(classId)
   }

@@ -11,6 +11,7 @@ import {
 import { AlreadyEnrolledException } from '../../domain/exceptions/already-enrolled.exception'
 import { ClassNotFoundException } from '../../../classes/domain/exceptions/class-not-found.exception'
 import { AuthenticatedUser } from 'src/common/interfaces'
+import { CacheInvalidate } from 'src/common/cache'
 
 @Injectable()
 export class EnrollUseCase {
@@ -21,6 +22,10 @@ export class EnrollUseCase {
     private readonly classRepository: IClassRepository,
   ) {}
 
+  @CacheInvalidate(
+    'cache:enrollments-by-user:*',
+    'cache:enrollments-by-class:*',
+  )
   async execute(
     classCode: string,
     user: AuthenticatedUser,

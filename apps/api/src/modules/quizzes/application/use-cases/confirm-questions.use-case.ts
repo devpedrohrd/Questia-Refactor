@@ -15,6 +15,7 @@ import { QuizAlreadyPublishedException } from '../../domain/exceptions/quiz-alre
 import { AuthenticatedUser } from 'src/common/interfaces'
 import { Role } from 'src/common/enums'
 import { Redis } from 'ioredis'
+import { CacheInvalidate } from 'src/common/cache'
 
 @Injectable()
 export class ConfirmQuestionsUseCase {
@@ -29,6 +30,11 @@ export class ConfirmQuestionsUseCase {
 
   private readonly redis: Redis
 
+  @CacheInvalidate(
+    (_quizId: string) => `cache:quiz:${_quizId}`,
+    'cache:quizzes-by-user:*',
+    'cache:quizzes-by-class:*',
+  )
   async execute(
     quizId: string,
     questions: Omit<CreateQuestionInput, 'quizId'>[],
