@@ -15,12 +15,14 @@ import {
   Sparkles,
   History,
   Brain,
+  HelpCircle,
 } from 'lucide-react'
 
 type NavItem = {
   label: string
   href: string
   icon: React.ReactNode
+  dataTutorial?: string
 }
 
 const professorNav: NavItem[] = [
@@ -33,21 +35,25 @@ const professorNav: NavItem[] = [
     label: 'Turmas',
     href: '/dashboard/professor/classes',
     icon: <BookOpen size={20} />,
+    dataTutorial: 'nav-turmas',
   },
   {
     label: 'Quizzes',
     href: '/dashboard/professor/quizzes',
     icon: <FileQuestion size={20} />,
+    dataTutorial: 'nav-quizzes',
   },
   {
     label: 'Criar Quiz',
     href: '/dashboard/professor/quizzes/create',
     icon: <Sparkles size={20} />,
+    dataTutorial: 'nav-criar-quiz',
   },
   {
     label: 'Contextos IA',
     href: '/dashboard/professor/contexts',
     icon: <Brain size={20} />,
+    dataTutorial: 'nav-contextos',
   },
 ]
 
@@ -61,11 +67,13 @@ const alunoNav: NavItem[] = [
     label: 'Turmas',
     href: '/dashboard/aluno/classes',
     icon: <GraduationCap size={20} />,
+    dataTutorial: 'nav-turmas',
   },
   {
     label: 'Histórico',
     href: '/dashboard/aluno/history',
     icon: <History size={20} />,
+    dataTutorial: 'nav-historico',
   },
 ]
 
@@ -212,6 +220,7 @@ export function Sidebar({ isMobile, open, onClose }: SidebarProps) {
                 key={item.href}
                 href={item.href}
                 onClick={handleNavClick}
+                data-tutorial={item.dataTutorial}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -249,9 +258,34 @@ export function Sidebar({ isMobile, open, onClose }: SidebarProps) {
             gap: '0.25rem',
           }}
         >
+          <button
+            onClick={() => {
+              if (isMobile) onClose()
+              window.dispatchEvent(new CustomEvent('QUESTIA_START_TUTORIAL'))
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              padding: '0.625rem 0.875rem',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+              backgroundColor: 'transparent',
+              border: 'none',
+              width: '100%',
+              transition: 'all var(--transition-fast)',
+              cursor: 'pointer',
+            }}
+          >
+            <HelpCircle size={20} />
+            <span>Ajuda</span>
+          </button>
+
           <Link
             href="/dashboard/profile"
             onClick={handleNavClick}
+            data-tutorial="nav-config"
             style={{
               display: 'flex',
               alignItems: 'center',

@@ -8,7 +8,7 @@ import { Modal } from '../../../../components/ui/Modal'
 import { Input, TextArea, Select } from '../../../../components/ui/Input'
 import { EmptyState } from '../../../../components/ui/EmptyState'
 import { PageLoader } from '../../../../components/ui/Spinner'
-import { Brain, Plus, Trash2 } from 'lucide-react'
+import { Brain, Plus, Trash2, Edit3 } from 'lucide-react'
 import {
   generationContextsService,
   type CreateGenerationContextRequest,
@@ -42,22 +42,27 @@ const difficultyStrategyOptions = [
   { value: 'PERSONALIZADA', label: 'Personalizada' },
 ]
 
+const EMPTY_FORM: CreateGenerationContextRequest = {
+  name: '',
+  gradeLevel: '',
+  subject: '',
+  topic: '',
+  learningObjectives: [''],
+  cognitiveLevel: 'APLICAR' as CognitiveLevel,
+  languageStyle: 'FORMAL' as LanguageStyle,
+  difficultyStrategy: 'PROGRESSIVA' as DifficultyStrategy,
+  rules: [''],
+  referenceMaterial: '',
+}
+
 export default function ProfessorContextsPage() {
   const [contexts, setContexts] = useState<GenerationContext[]>([])
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
-  const [creating, setCreating] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<CreateGenerationContextRequest>({
-    name: '',
-    gradeLevel: '',
-    subject: '',
-    topic: '',
-    learningObjectives: [''],
-    cognitiveLevel: 'APLICAR' as CognitiveLevel,
-    languageStyle: 'FORMAL' as LanguageStyle,
-    difficultyStrategy: 'PROGRESSIVA' as DifficultyStrategy,
-    rules: [''],
-    referenceMaterial: '',
+    ...EMPTY_FORM,
   })
 
   useEffect(() => {
@@ -67,30 +72,57 @@ export default function ProfessorContextsPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const handleCreate = async () => {
-    setCreating(true)
+  const openCreateModal = () => {
+    setEditingId(null)
+    setForm({ ...EMPTY_FORM, learningObjectives: [''], rules: [''] })
+    setModalOpen(true)
+  }
+
+  const openEditModal = (ctx: GenerationContext) => {
+    setEditingId(ctx.id)
+    setForm({
+      name: ctx.name,
+      gradeLevel: ctx.gradeLevel,
+      subject: ctx.subject,
+      topic: ctx.topic,
+      learningObjectives:
+        ctx.learningObjectives.length > 0 ? ctx.learningObjectives : [''],
+      cognitiveLevel: ctx.cognitiveLevel,
+      languageStyle: ctx.languageStyle,
+      difficultyStrategy: ctx.difficultyStrategy,
+      rules: ctx.rules && ctx.rules.length > 0 ? ctx.rules : [''],
+      referenceMaterial: ctx.referenceMaterial || '',
+    })
+    setModalOpen(true)
+  }
+
+  const handleSave = async () => {
+    setSaving(true)
     try {
-      const ctx = await generationContextsService.create({
+      const payload = {
         ...form,
         learningObjectives: form.learningObjectives.filter(Boolean),
         rules: form.rules.filter(Boolean),
-      })
-      setContexts((prev) => [...prev, ctx])
+      }
+
+      if (editingId) {
+        const updated = await generationContextsService.update(
+          editingId,
+          payload,
+        )
+        setContexts((prev) =>
+          prev.map((c) => (c.id === editingId ? updated : c)),
+        )
+      } else {
+        const created = await generationContextsService.create(payload)
+        setContexts((prev) => [...prev, created])
+      }
+
       setModalOpen(false)
-      setForm({
-        name: '',
-        gradeLevel: '',
-        subject: '',
-        topic: '',
-        learningObjectives: [''],
-        cognitiveLevel: 'APLICAR' as CognitiveLevel,
-        languageStyle: 'FORMAL' as LanguageStyle,
-        difficultyStrategy: 'PROGRESSIVA' as DifficultyStrategy,
-        rules: [''],
-        referenceMaterial: '',
-      })
+      setEditingId(null)
+      setForm({ ...EMPTY_FORM, learningObjectives: [''], rules: [''] })
     } finally {
-      setCreating(false)
+      setSaving(false)
     }
   }
 
@@ -108,11 +140,7 @@ export default function ProfessorContextsPage() {
         title="Contextos de Geração IA"
         subtitle="Configure contextos para guiar a IA na criação de questões"
         actions={
-          <Button
-            icon={<Plus size={16} />}
-            size="sm"
-            onClick={() => setModalOpen(true)}
-          >
+          <Button icon={<Plus size={16} />} size="sm" onClick={openCreateModal}>
             Novo Contexto
           </Button>
         }
@@ -125,7 +153,7 @@ export default function ProfessorContextsPage() {
             description="Contextos ajudam a IA a gerar questões mais precisas e alinhadas ao currículo."
             action={{
               label: 'Criar Contexto',
-              onClick: () => setModalOpen(true),
+              onClick: openCreateModal,
             }}
           />
         ) : (
@@ -168,12 +196,20 @@ export default function ProfessorContextsPage() {
                       {ctx.languageStyle}
                     </p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(ctx.id)}
-                    icon={<Trash2 size={14} />}
-                  />
+                  <div style={{ display: 'flex', gap: '0.25rem' }}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openEditModal(ctx)}
+                      icon={<Edit3 size={14} />}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(ctx.id)}
+                      icon={<Trash2 size={14} />}
+                    />
+                  </div>
                 </div>
                 {ctx.learningObjectives.length > 0 && (
                   <div
@@ -211,28 +247,39 @@ export default function ProfessorContextsPage() {
         )}
       </div>
 
+      {/* Create / Edit Modal */}
       <Modal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title="Novo Contexto"
+        onClose={() => {
+          setModalOpen(false)
+          setEditingId(null)
+        }}
+        title={editingId ? 'Editar Contexto' : 'Novo Contexto'}
         width="640px"
         footer={
           <>
-            <Button variant="secondary" onClick={() => setModalOpen(false)}>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setModalOpen(false)
+                setEditingId(null)
+              }}
+            >
               Cancelar
             </Button>
             <Button
-              onClick={handleCreate}
-              loading={creating}
+              onClick={handleSave}
+              loading={saving}
               disabled={!form.name || !form.subject}
             >
-              Criar
+              {editingId ? 'Salvar' : 'Criar'}
             </Button>
           </>
         }
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div
+            className="grid-responsive"
             style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
@@ -252,6 +299,7 @@ export default function ProfessorContextsPage() {
             />
           </div>
           <div
+            className="grid-responsive"
             style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
@@ -271,6 +319,7 @@ export default function ProfessorContextsPage() {
             />
           </div>
           <div
+            className="grid-responsive"
             style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr 1fr',

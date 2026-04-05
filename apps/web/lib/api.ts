@@ -27,11 +27,19 @@ api.interceptors.response.use(
         await api.post('/auth/refresh', {})
         return api(originalRequest)
       } catch {
-        if (
-          typeof window !== 'undefined' &&
-          window.location.pathname !== '/login'
-        ) {
-          window.location.href = '/login'
+        if (typeof window !== 'undefined') {
+          const authPages = [
+            '/login',
+            '/register',
+            '/forgot-password',
+            '/reset-password',
+          ]
+          const isAuthPage = authPages.some((p) =>
+            window.location.pathname.startsWith(p),
+          )
+          if (!isAuthPage) {
+            window.location.href = '/login'
+          }
         }
         return Promise.reject(error)
       }

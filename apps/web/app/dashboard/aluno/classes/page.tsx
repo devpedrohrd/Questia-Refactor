@@ -8,7 +8,7 @@ import { Input } from '../../../../components/ui/Input'
 import { Modal } from '../../../../components/ui/Modal'
 import { EmptyState } from '../../../../components/ui/EmptyState'
 import { PageLoader } from '../../../../components/ui/Spinner'
-import { GraduationCap, Plus, LogIn } from 'lucide-react'
+import { GraduationCap, Plus, LogIn, LogOut } from 'lucide-react'
 import { enrollmentsService } from '../../../../lib/services/enrollments.service'
 import { classesService } from '../../../../lib/services/classes.service'
 import type { Enrollment, Class } from '@repo/api'
@@ -22,6 +22,11 @@ export default function AlunoClassesPage() {
   const [code, setCode] = useState('')
   const [enrolling, setEnrolling] = useState(false)
   const [error, setError] = useState('')
+  const [leaveModal, setLeaveModal] = useState<{
+    enrollmentId: string
+    className: string
+  } | null>(null)
+  const [leaving, setLeaving] = useState(false)
 
   useEffect(() => {
     async function loadData() {
@@ -72,6 +77,22 @@ export default function AlunoClassesPage() {
     }
   }
 
+  const handleLeave = async () => {
+    if (!leaveModal) return
+    setLeaving(true)
+    try {
+      await enrollmentsService.unenroll(leaveModal.enrollmentId)
+      setEnrollments((prev) =>
+        prev.filter((e) => e.id !== leaveModal.enrollmentId),
+      )
+      setLeaveModal(null)
+    } catch {
+      setError('Erro ao sair da turma.')
+    } finally {
+      setLeaving(false)
+    }
+  }
+
   if (loading) return <PageLoader />
 
   return (
@@ -111,12 +132,11 @@ export default function AlunoClassesPage() {
             {enrollments.map((e) => {
               const cls = classMap[e.classId]
               return (
-                <Link
-                  key={e.id}
-                  href={`/dashboard/aluno/classes/${e.classId}`}
-                  style={{ textDecoration: 'none' }}
-                >
-                  <Card hoverable padding="1.5rem">
+                <Card key={e.id} hoverable padding="1.5rem">
+                  <Link
+                    href={`/dashboard/aluno/classes/${e.classId}`}
+                    style={{ textDecoration: 'none', color: 'inherit' }}
+                  >
                     <h4 style={{ fontWeight: 600, marginBottom: '0.25rem' }}>
                       {cls?.name || '...'}
                     </h4>
@@ -138,14 +158,38 @@ export default function AlunoClassesPage() {
                     >
                       Código: {cls?.code || '...'}
                     </p>
-                  </Card>
-                </Link>
+                  </Link>
+                  <div
+                    style={{
+                      marginTop: '0.75rem',
+                      paddingTop: '0.75rem',
+                      borderTop: '1px solid var(--color-border)',
+                      display: 'flex',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      icon={<LogOut size={14} />}
+                      onClick={() =>
+                        setLeaveModal({
+                          enrollmentId: e.id,
+                          className: cls?.name || 'esta turma',
+                        })
+                      }
+                    >
+                      Sair
+                    </Button>
+                  </div>
+                </Card>
               )
             })}
           </div>
         )}
       </div>
 
+      {/* Enroll modal */}
       <Modal
         open={modalOpen}
         onClose={() => {
@@ -186,6 +230,31 @@ export default function AlunoClassesPage() {
             </p>
           )}
         </div>
+      </Modal>
+
+      {/* Leave confirmation modal */}
+      <Modal
+        open={!!leaveModal}
+        onClose={() => setLeaveModal(null)}
+        title="Sair da Turma"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setLeaveModal(null)}>
+              Cancelar
+            </Button>
+            <Button variant="danger" onClick={handleLeave} loading={leaving}>
+              Sair da Turma
+            </Button>
+          </>
+        }
+      >
+        <p
+          style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}
+        >
+          Tem certeza que deseja sair da turma{' '}
+          <strong>{leaveModal?.className}</strong>? Você perderá acesso aos
+          quizzes desta turma.
+        </p>
       </Modal>
     </>
   )

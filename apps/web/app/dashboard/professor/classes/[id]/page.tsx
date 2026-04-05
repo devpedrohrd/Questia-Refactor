@@ -1,13 +1,15 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Header } from '../../../../../components/layout/Header'
 import { Card } from '../../../../../components/ui/Card'
 import { Badge, QuizStatusBadge } from '../../../../../components/ui/Badge'
+import { Button } from '../../../../../components/ui/Button'
+import { Modal } from '../../../../../components/ui/Modal'
 import { PageLoader } from '../../../../../components/ui/Spinner'
 import { EmptyState } from '../../../../../components/ui/EmptyState'
-import { User as UserIcon, FileQuestion } from 'lucide-react'
+import { User as UserIcon, FileQuestion, Trash2 } from 'lucide-react'
 import { classesService } from '../../../../../lib/services/classes.service'
 import {
   enrollmentsService,
@@ -20,6 +22,7 @@ import Link from 'next/link'
 
 export default function ProfessorClassDetailPage() {
   const params = useParams()
+  const router = useRouter()
   const classId = params.id as string
   const [cls, setCls] = useState<Class | null>(null)
   const [enrollments, setEnrollments] = useState<EnrollmentWithClass[]>([])
@@ -27,6 +30,8 @@ export default function ProfessorClassDetailPage() {
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<'students' | 'quizzes'>('students')
   const [userMap, setUserMap] = useState<Record<string, User>>({})
+  const [deleteModal, setDeleteModal] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     async function loadData() {
@@ -57,6 +62,16 @@ export default function ProfessorClassDetailPage() {
     loadData()
   }, [classId])
 
+  const handleDelete = async () => {
+    setDeleting(true)
+    try {
+      await classesService.delete(classId)
+      router.push('/dashboard/professor/classes')
+    } catch {
+      setDeleting(false)
+    }
+  }
+
   if (loading || !cls) return <PageLoader />
 
   const tabs = [
@@ -69,6 +84,16 @@ export default function ProfessorClassDetailPage() {
       <Header
         title={cls.name}
         subtitle={`${cls.subject} · Código: ${cls.code}`}
+        actions={
+          <Button
+            variant="danger"
+            size="sm"
+            icon={<Trash2 size={14} />}
+            onClick={() => setDeleteModal(true)}
+          >
+            Excluir
+          </Button>
+        }
       />
       <div className="page-padding" style={{ padding: '2rem' }}>
         {/* Tabs */}
@@ -92,10 +117,6 @@ export default function ProfessorClassDetailPage() {
                   tab === t.key
                     ? 'var(--color-text-primary)'
                     : 'var(--color-text-secondary)',
-                borderBottom:
-                  tab === t.key
-                    ? '2px solid var(--color-gray-950)'
-                    : '2px solid transparent',
                 background: 'none',
                 border: 'none',
                 borderBottomWidth: '2px',
@@ -224,6 +245,31 @@ export default function ProfessorClassDetailPage() {
           </>
         )}
       </div>
+
+      {/* Delete confirmation modal */}
+      <Modal
+        open={deleteModal}
+        onClose={() => setDeleteModal(false)}
+        title="Excluir Turma"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setDeleteModal(false)}>
+              Cancelar
+            </Button>
+            <Button variant="danger" onClick={handleDelete} loading={deleting}>
+              Excluir permanentemente
+            </Button>
+          </>
+        }
+      >
+        <p
+          style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}
+        >
+          Tem certeza que deseja excluir a turma <strong>{cls.name}</strong>?
+          Esta ação é <strong>irreversível</strong> e todos os alunos
+          matriculados perderão acesso.
+        </p>
+      </Modal>
     </>
   )
 }
