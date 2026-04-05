@@ -98,6 +98,7 @@ export class PrismaAttemptRepository implements IAttemptRepository {
                 id: true,
                 statement: true,
                 type: true,
+                explanation: true,
 
                 alternatives: {
                   select: {

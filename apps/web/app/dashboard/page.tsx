@@ -2,10 +2,10 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '../contexts/AuthContext'
-import { PageLoader } from '../components/ui/Spinner'
+import { useAuth } from '../../contexts/AuthContext'
+import { PageLoader } from '../../components/ui/Spinner'
 
-export default function HomePage() {
+export default function DashboardRootPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
 
@@ -15,8 +15,6 @@ export default function HomePage() {
       router.replace(
         user.role === 'PROFESSOR' ? '/dashboard/professor' : '/dashboard/aluno',
       )
-    } else {
-      router.replace('/login')
     }
   }, [user, loading, router])
 
