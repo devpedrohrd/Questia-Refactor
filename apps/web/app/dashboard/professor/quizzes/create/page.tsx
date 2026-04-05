@@ -218,7 +218,10 @@ export default function CreateQuizPage() {
         title="Criar Quiz com IA"
         subtitle="Siga os passos para gerar um quiz automaticamente"
       />
-      <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
+      <div
+        className="page-padding"
+        style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}
+      >
         <div style={{ marginBottom: '2rem' }}>
           <Stepper steps={STEPS} currentStep={step} />
         </div>
@@ -321,6 +324,7 @@ export default function CreateQuizPage() {
                 }}
               >
                 <div
+                  className="grid-responsive"
                   style={{
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
@@ -348,6 +352,7 @@ export default function CreateQuizPage() {
                   />
                 </div>
                 <div
+                  className="grid-responsive"
                   style={{
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
@@ -370,6 +375,7 @@ export default function CreateQuizPage() {
                   />
                 </div>
                 <div
+                  className="grid-responsive"
                   style={{
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr 1fr',
@@ -551,6 +557,7 @@ export default function CreateQuizPage() {
                 required
               />
               <div
+                className="grid-responsive"
                 style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
@@ -581,6 +588,7 @@ export default function CreateQuizPage() {
                 />
               </div>
               <div
+                className="grid-responsive"
                 style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',

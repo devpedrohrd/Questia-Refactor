@@ -1,5 +1,8 @@
+'use client'
+
 import React from 'react'
 import { Check } from 'lucide-react'
+import { useIsMobile } from '../../lib/hooks/useIsMobile'
 
 type StepperProps = {
   steps: string[]
@@ -7,13 +10,16 @@ type StepperProps = {
 }
 
 export function Stepper({ steps, currentStep }: StepperProps) {
+  const isMobile = useIsMobile()
+
   return (
     <div
       style={{
         display: 'flex',
         alignItems: 'center',
         width: '100%',
-        padding: '0 1rem',
+        padding: isMobile ? '0' : '0 1rem',
+        overflowX: isMobile ? 'auto' : undefined,
       }}
     >
       {steps.map((label, index) => {
@@ -43,38 +49,35 @@ export function Stepper({ steps, currentStep }: StepperProps) {
                   fontSize: '0.8125rem',
                   fontWeight: 600,
                   transition: 'all var(--transition-base)',
-                  ...(isCompleted
+                  ...(isCompleted || isCurrent
                     ? {
                         backgroundColor: 'var(--color-gray-950)',
                         color: 'var(--color-white)',
                       }
-                    : isCurrent
-                      ? {
-                          backgroundColor: 'var(--color-gray-950)',
-                          color: 'var(--color-white)',
-                        }
-                      : {
-                          backgroundColor: 'var(--color-gray-100)',
-                          color: 'var(--color-text-tertiary)',
-                          border: '1px solid var(--color-border)',
-                        }),
+                    : {
+                        backgroundColor: 'var(--color-gray-100)',
+                        color: 'var(--color-text-tertiary)',
+                        border: '1px solid var(--color-border)',
+                      }),
                 }}
               >
                 {isCompleted ? <Check size={14} strokeWidth={3} /> : index + 1}
               </div>
-              <span
-                style={{
-                  fontSize: '0.75rem',
-                  fontWeight: isCurrent || isCompleted ? 500 : 400,
-                  color:
-                    isCurrent || isCompleted
-                      ? 'var(--color-text-primary)'
-                      : 'var(--color-text-tertiary)',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {label}
-              </span>
+              {!isMobile && (
+                <span
+                  style={{
+                    fontSize: '0.75rem',
+                    fontWeight: isCurrent || isCompleted ? 500 : 400,
+                    color:
+                      isCurrent || isCompleted
+                        ? 'var(--color-text-primary)'
+                        : 'var(--color-text-tertiary)',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {label}
+                </span>
+              )}
             </div>
             {!isLast && (
               <div
@@ -84,9 +87,10 @@ export function Stepper({ steps, currentStep }: StepperProps) {
                   backgroundColor: isCompleted
                     ? 'var(--color-gray-950)'
                     : 'var(--color-border)',
-                  margin: '0 0.75rem',
-                  marginBottom: '1.5rem',
+                  margin: isMobile ? '0 0.5rem' : '0 0.75rem',
+                  marginBottom: isMobile ? '0' : '1.5rem',
                   transition: 'background-color var(--transition-base)',
+                  minWidth: '1.5rem',
                 }}
               />
             )}

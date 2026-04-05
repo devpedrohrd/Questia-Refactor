@@ -92,7 +92,7 @@ export default function AlunoDashboardPage() {
   return (
     <>
       <Header title="Dashboard" subtitle="Visão geral da sua conta de aluno" />
-      <div style={{ padding: '2rem' }}>
+      <div className="page-padding" style={{ padding: '2rem' }}>
         <div
           style={{
             display: 'grid',

@@ -117,7 +117,7 @@ export default function ProfessorContextsPage() {
           </Button>
         }
       />
-      <div style={{ padding: '2rem' }}>
+      <div className="page-padding" style={{ padding: '2rem' }}>
         {contexts.length === 0 ? (
           <EmptyState
             icon={<Brain size={48} />}

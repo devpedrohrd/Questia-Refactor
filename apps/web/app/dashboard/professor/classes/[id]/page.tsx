@@ -70,7 +70,7 @@ export default function ProfessorClassDetailPage() {
         title={cls.name}
         subtitle={`${cls.subject} · Código: ${cls.code}`}
       />
-      <div style={{ padding: '2rem' }}>
+      <div className="page-padding" style={{ padding: '2rem' }}>
         {/* Tabs */}
         <div
           style={{

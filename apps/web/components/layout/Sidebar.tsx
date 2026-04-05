@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '../../contexts/AuthContext'
@@ -11,8 +11,7 @@ import {
   FileQuestion,
   Settings,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
+  X,
   Sparkles,
   History,
   Brain,
@@ -70,19 +69,25 @@ const alunoNav: NavItem[] = [
   },
 ]
 
-export function Sidebar() {
+type SidebarProps = {
+  isMobile: boolean
+  open: boolean
+  onClose: () => void
+}
+
+export function Sidebar({ isMobile, open, onClose }: SidebarProps) {
   const { user, logout } = useAuth()
   const pathname = usePathname()
-  const [collapsed, setCollapsed] = useState(false)
 
   const nav = user?.role === 'PROFESSOR' ? professorNav : alunoNav
 
-  return (
-    <aside
-      style={{
-        width: collapsed
-          ? 'var(--sidebar-collapsed-width)'
-          : 'var(--sidebar-width)',
+  const handleNavClick = () => {
+    if (isMobile) onClose()
+  }
+
+  const sidebarStyle: React.CSSProperties = isMobile
+    ? {
+        width: 'var(--sidebar-width)',
         height: '100vh',
         position: 'fixed',
         left: 0,
@@ -91,26 +96,51 @@ export function Sidebar() {
         flexDirection: 'column',
         borderRight: '1px solid var(--color-border)',
         backgroundColor: 'var(--color-white)',
-        transition: 'width var(--transition-slow)',
         zIndex: 100,
         overflow: 'hidden',
-      }}
-    >
-      {/* Logo */}
-      <div
-        style={{
-          padding: collapsed ? '1.5rem 0.75rem' : '1.5rem 1.25rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: collapsed ? 'center' : 'space-between',
-          borderBottom: '1px solid var(--color-border)',
-          minHeight: 'var(--header-height)',
-        }}
-      >
-        {!collapsed && (
+        transform: open ? 'translateX(0)' : 'translateX(-100%)',
+        transition: 'transform var(--transition-slow)',
+      }
+    : {
+        width: 'var(--sidebar-width)',
+        height: '100vh',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        borderRight: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-white)',
+        zIndex: 100,
+        overflow: 'hidden',
+      }
+
+  return (
+    <>
+      {/* Mobile overlay */}
+      {isMobile && (
+        <div
+          className={`sidebar-overlay${open ? ' active' : ''}`}
+          onClick={onClose}
+        />
+      )}
+
+      <aside style={sidebarStyle}>
+        {/* Logo */}
+        <div
+          style={{
+            padding: '1.5rem 1.25rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: '1px solid var(--color-border)',
+            minHeight: 'var(--header-height)',
+          }}
+        >
           <Link
             href="/dashboard"
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            onClick={handleNavClick}
           >
             <div
               style={{
@@ -138,148 +168,130 @@ export function Sidebar() {
               QuestIA
             </span>
           </Link>
-        )}
-        {collapsed && (
-          <div
-            style={{
-              width: '2rem',
-              height: '2rem',
-              borderRadius: 'var(--radius-md)',
-              backgroundColor: 'var(--color-gray-950)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--color-white)',
-              fontWeight: 800,
-              fontSize: '0.875rem',
-            }}
-          >
-            Q
-          </div>
-        )}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '1.75rem',
-            height: '1.75rem',
-            borderRadius: 'var(--radius-sm)',
-            border: '1px solid var(--color-border)',
-            backgroundColor: 'var(--color-white)',
-            color: 'var(--color-text-secondary)',
-            cursor: 'pointer',
-            transition: 'all var(--transition-fast)',
-            flexShrink: 0,
-          }}
-        >
-          {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-        </button>
-      </div>
 
-      {/* Navigation */}
-      <nav
-        style={{
-          flex: 1,
-          padding: '0.75rem',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.25rem',
-          overflowY: 'auto',
-        }}
-      >
-        {nav.map((item) => {
-          const isActive =
-            pathname === item.href ||
-            (item.href !== '/dashboard/professor' &&
-              item.href !== '/dashboard/aluno' &&
-              pathname.startsWith(item.href))
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
+          {isMobile && (
+            <button
+              onClick={onClose}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.75rem',
-                padding: collapsed ? '0.625rem' : '0.625rem 0.875rem',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '0.875rem',
-                fontWeight: isActive ? 500 : 400,
-                color: isActive
-                  ? 'var(--color-text-primary)'
-                  : 'var(--color-text-secondary)',
-                backgroundColor: isActive
-                  ? 'var(--color-gray-100)'
-                  : 'transparent',
-                transition: 'all var(--transition-fast)',
-                justifyContent: collapsed ? 'center' : 'flex-start',
-                textDecoration: 'none',
+                justifyContent: 'center',
+                width: '1.75rem',
+                height: '1.75rem',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--color-border)',
+                backgroundColor: 'var(--color-white)',
+                color: 'var(--color-text-secondary)',
+                cursor: 'pointer',
               }}
-              title={collapsed ? item.label : undefined}
             >
-              <span style={{ flexShrink: 0, display: 'flex' }}>
-                {item.icon}
-              </span>
-              {!collapsed && <span>{item.label}</span>}
-            </Link>
-          )
-        })}
-      </nav>
+              <X size={14} />
+            </button>
+          )}
+        </div>
 
-      {/* User & Logout */}
-      <div
-        style={{
-          padding: '0.75rem',
-          borderTop: '1px solid var(--color-border)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.25rem',
-        }}
-      >
-        <Link
-          href="/dashboard/profile"
+        {/* Navigation */}
+        <nav
           style={{
+            flex: 1,
+            padding: '0.75rem',
             display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            padding: collapsed ? '0.625rem' : '0.625rem 0.875rem',
-            borderRadius: 'var(--radius-md)',
-            fontSize: '0.875rem',
-            color: 'var(--color-text-secondary)',
-            transition: 'all var(--transition-fast)',
-            justifyContent: collapsed ? 'center' : 'flex-start',
-            textDecoration: 'none',
+            flexDirection: 'column',
+            gap: '0.25rem',
+            overflowY: 'auto',
           }}
-          title={collapsed ? 'Configurações' : undefined}
         >
-          <Settings size={20} />
-          {!collapsed && <span>Configurações</span>}
-        </Link>
-        <button
-          onClick={logout}
+          {nav.map((item) => {
+            const isActive =
+              pathname === item.href ||
+              (item.href !== '/dashboard/professor' &&
+                item.href !== '/dashboard/aluno' &&
+                pathname.startsWith(item.href))
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={handleNavClick}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '0.625rem 0.875rem',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '0.875rem',
+                  fontWeight: isActive ? 500 : 400,
+                  color: isActive
+                    ? 'var(--color-text-primary)'
+                    : 'var(--color-text-secondary)',
+                  backgroundColor: isActive
+                    ? 'var(--color-gray-100)'
+                    : 'transparent',
+                  transition: 'all var(--transition-fast)',
+                  textDecoration: 'none',
+                }}
+              >
+                <span style={{ flexShrink: 0, display: 'flex' }}>
+                  {item.icon}
+                </span>
+                <span>{item.label}</span>
+              </Link>
+            )
+          })}
+        </nav>
+
+        {/* User & Logout */}
+        <div
           style={{
+            padding: '0.75rem',
+            borderTop: '1px solid var(--color-border)',
             display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            padding: collapsed ? '0.625rem' : '0.625rem 0.875rem',
-            borderRadius: 'var(--radius-md)',
-            fontSize: '0.875rem',
-            color: 'var(--color-text-secondary)',
-            backgroundColor: 'transparent',
-            border: 'none',
-            width: '100%',
-            transition: 'all var(--transition-fast)',
-            justifyContent: collapsed ? 'center' : 'flex-start',
-            cursor: 'pointer',
+            flexDirection: 'column',
+            gap: '0.25rem',
           }}
-          title={collapsed ? 'Sair' : undefined}
         >
-          <LogOut size={20} />
-          {!collapsed && <span>Sair</span>}
-        </button>
-      </div>
-    </aside>
+          <Link
+            href="/dashboard/profile"
+            onClick={handleNavClick}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              padding: '0.625rem 0.875rem',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+              transition: 'all var(--transition-fast)',
+              textDecoration: 'none',
+            }}
+          >
+            <Settings size={20} />
+            <span>Configurações</span>
+          </Link>
+          <button
+            onClick={() => {
+              logout()
+              if (isMobile) onClose()
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              padding: '0.625rem 0.875rem',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+              backgroundColor: 'transparent',
+              border: 'none',
+              width: '100%',
+              transition: 'all var(--transition-fast)',
+              cursor: 'pointer',
+            }}
+          >
+            <LogOut size={20} />
+            <span>Sair</span>
+          </button>
+        </div>
+      </aside>
+    </>
   )
 }

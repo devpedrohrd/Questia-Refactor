@@ -70,7 +70,7 @@ export default function ProfessorClassesPage() {
           </Button>
         }
       />
-      <div style={{ padding: '2rem' }}>
+      <div className="page-padding" style={{ padding: '2rem' }}>
         {classes.length === 0 ? (
           <EmptyState
             icon={<BookOpen size={48} />}

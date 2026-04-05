@@ -44,7 +44,7 @@ export default function ProfessorQuizzesPage() {
           </Link>
         }
       />
-      <div style={{ padding: '2rem' }}>
+      <div className="page-padding" style={{ padding: '2rem' }}>
         {quizzes.length === 0 ? (
           <EmptyState
             icon={<FileQuestion size={48} />}

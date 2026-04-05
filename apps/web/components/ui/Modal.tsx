@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react'
 import { X } from 'lucide-react'
+import { useIsMobile } from '../../lib/hooks/useIsMobile'
 
 type ModalProps = {
   open: boolean
@@ -20,6 +21,8 @@ export function Modal({
   footer,
   width = '480px',
 }: ModalProps) {
+  const isMobile = useIsMobile()
+
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden'
@@ -40,9 +43,9 @@ export function Modal({
         inset: 0,
         zIndex: 1000,
         display: 'flex',
-        alignItems: 'center',
+        alignItems: isMobile ? 'flex-end' : 'center',
         justifyContent: 'center',
-        padding: '1rem',
+        padding: isMobile ? '0' : '1rem',
       }}
     >
       {/* Overlay */}
@@ -60,13 +63,17 @@ export function Modal({
         style={{
           position: 'relative',
           backgroundColor: 'var(--color-white)',
-          borderRadius: 'var(--radius-xl)',
+          borderRadius: isMobile
+            ? 'var(--radius-xl) var(--radius-xl) 0 0'
+            : 'var(--radius-xl)',
           width: '100%',
-          maxWidth: width,
-          maxHeight: '85vh',
+          maxWidth: isMobile ? '100%' : width,
+          maxHeight: isMobile ? '90vh' : '85vh',
           display: 'flex',
           flexDirection: 'column',
-          animation: 'scaleIn 200ms ease-out',
+          animation: isMobile
+            ? 'fadeInUp 200ms ease-out'
+            : 'scaleIn 200ms ease-out',
           boxShadow: 'var(--shadow-xl)',
         }}
       >
@@ -76,7 +83,7 @@ export function Modal({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '1.25rem 1.5rem',
+            padding: isMobile ? '1rem 1.25rem' : '1.25rem 1.5rem',
             borderBottom: '1px solid var(--color-border)',
           }}
         >
@@ -108,7 +115,13 @@ export function Modal({
           </button>
         </div>
         {/* Body */}
-        <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+        <div
+          style={{
+            padding: isMobile ? '1.25rem' : '1.5rem',
+            overflowY: 'auto',
+            flex: 1,
+          }}
+        >
           {children}
         </div>
         {/* Footer */}
@@ -118,8 +131,11 @@ export function Modal({
               display: 'flex',
               justifyContent: 'flex-end',
               gap: '0.75rem',
-              padding: '1rem 1.5rem',
+              padding: isMobile ? '0.75rem 1.25rem' : '1rem 1.5rem',
               borderTop: '1px solid var(--color-border)',
+              paddingBottom: isMobile
+                ? 'calc(0.75rem + env(safe-area-inset-bottom, 0px))'
+                : undefined,
             }}
           >
             {footer}

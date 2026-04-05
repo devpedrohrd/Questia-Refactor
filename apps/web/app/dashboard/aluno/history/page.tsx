@@ -53,7 +53,7 @@ export default function AlunoHistoryPage() {
         title="Histórico"
         subtitle={`${attempts.length} tentativa${attempts.length !== 1 ? 's' : ''}`}
       />
-      <div style={{ padding: '2rem' }}>
+      <div className="page-padding" style={{ padding: '2rem' }}>
         {attempts.length === 0 ? (
           <EmptyState
             icon={<History size={48} />}

@@ -54,7 +54,7 @@ export default function ProfessorDashboardPage() {
         title="Dashboard"
         subtitle="Visão geral da sua conta de professor"
       />
-      <div style={{ padding: '2rem' }}>
+      <div className="page-padding" style={{ padding: '2rem' }}>
         {/* Stats */}
         <div
           style={{

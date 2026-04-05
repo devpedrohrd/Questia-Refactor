@@ -89,7 +89,7 @@ export default function AlunoClassesPage() {
           </Button>
         }
       />
-      <div style={{ padding: '2rem' }}>
+      <div className="page-padding" style={{ padding: '2rem' }}>
         {enrollments.length === 0 ? (
           <EmptyState
             icon={<GraduationCap size={48} />}

@@ -94,7 +94,7 @@ export default function ProfessorQuizDetailPage() {
           ) : undefined
         }
       />
-      <div style={{ padding: '2rem' }}>
+      <div className="page-padding" style={{ padding: '2rem' }}>
         {/* Status bar */}
         <div
           style={{

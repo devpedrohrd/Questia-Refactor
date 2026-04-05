@@ -42,7 +42,7 @@ export default function AlunoClassDetailPage() {
         title={cls.name}
         subtitle={`${cls.subject} · ${publishedQuizzes.length} quiz${publishedQuizzes.length !== 1 ? 'zes' : ''} disponíve${publishedQuizzes.length !== 1 ? 'is' : 'l'}`}
       />
-      <div style={{ padding: '2rem' }}>
+      <div className="page-padding" style={{ padding: '2rem' }}>
         {publishedQuizzes.length === 0 ? (
           <EmptyState
             icon={<FileQuestion size={48} />}

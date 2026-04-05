@@ -59,7 +59,10 @@ export default function ProfilePage() {
         title="Meu Perfil"
         subtitle="Gerencie suas informações pessoais"
       />
-      <div style={{ padding: '2rem', maxWidth: '600px' }}>
+      <div
+        className="page-padding"
+        style={{ padding: '2rem', maxWidth: '600px' }}
+      >
         <Card>
           <form
             onSubmit={handleUpdate}
