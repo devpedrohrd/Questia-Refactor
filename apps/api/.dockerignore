@@ -1,0 +1,17 @@
+node_modules
+dist
+.turbo
+.next
+.vercel
+.git
+.gitignore
+.env
+.env.*
+*.md
+!README.md
+coverage
+test-results
+playwright-report
+.vscode
+.idea
+*.log
