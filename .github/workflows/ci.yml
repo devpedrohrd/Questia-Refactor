@@ -45,6 +45,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Build internal packages
+        run: bun run --filter='@repo/*' build
+
       - name: Generate Prisma Client
         run: cd apps/api && bunx prisma generate
 
