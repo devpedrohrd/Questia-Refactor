@@ -112,7 +112,7 @@ export default function AlunoAttemptFeedbackPage() {
             >
               Gabarito
             </h3>
-            {attempt.answers.map((ans, i) => (
+            {attempt.answers.map((ans: any, i: number) => (
               <Card key={ans.id} padding="1.25rem">
                 <div
                   style={{
