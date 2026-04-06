@@ -49,6 +49,9 @@ jobs:
       - name: Generate Prisma Client
         run: cd apps/api && bunx prisma generate
 
+      - name: Build packages
+        run: bun run build
+
       - name: Run tests
         run: bun run test
 
