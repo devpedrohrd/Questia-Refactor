@@ -36,7 +36,7 @@ async function bootstrap() {
   )
 
   app.enableCors({
-    origin: ['http://localhost:3001', 'http://localhost:3000'],
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   })
@@ -61,7 +61,7 @@ async function bootstrap() {
   app.enableShutdownHooks()
 
   await app.listen(port)
-  logger.log(`🚀 Application is running on: http://localhost:${port}`)
+  logger.log(`🚀 Application is running on port: ${port}`)
 
   const shutdown = async (signal: string) => {
     logger.log(`Received ${signal}, starting graceful shutdown...`)

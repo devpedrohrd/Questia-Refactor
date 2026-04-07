@@ -189,6 +189,6 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
 
-    return res.redirect('http://localhost:3001/auth/callback')
+    return res.redirect(`${process.env.FRONTEND_URL}/auth/callback`)
   }
 }

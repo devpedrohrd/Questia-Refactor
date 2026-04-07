@@ -18,7 +18,7 @@ export class MailService {
   }
 
   async sendForgotPasswordEmail(email: string, token: string) {
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3001'}/reset-password?token=${token}`
+    const resetUrl = `${process.env.FRONTEND_URL}/auth/reset-password?token=${token}`
     const { text, html } = getForgotPasswordEmailTemplate(resetUrl)
 
     try {
