@@ -73,7 +73,7 @@ RUN addgroup -g 1001 -S nodejs && \
 
 USER nestjs
 
-EXPOSE 3000
+EXPOSE 3333
 
 # Use dumb-init for proper signal handling
-CMD ["dumb-init", "node", "dist/main.js"]
+CMD ["dumb-init", "node", "dist/src/main.js"]
