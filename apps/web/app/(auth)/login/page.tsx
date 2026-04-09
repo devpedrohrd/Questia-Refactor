@@ -8,7 +8,7 @@ import { Button } from '../../../components/ui/Button'
 import { Input } from '../../../components/ui/Input'
 import { Mail, Lock } from 'lucide-react'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'
+const API_URL = process.env.API_URL || '/api'
 
 export default function LoginPage() {
   const { login } = useAuth()
